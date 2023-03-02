@@ -18,8 +18,12 @@
             <a href="/">home</a>
             <a href="/menu/1">menu</a>
             <a href="/contact">contact</a>
-            <a href="/login">login</a>
-            <a href="/signup">signup</a>
+            {% if logged_in %}
+                <a href="/logout">logout</a>
+            {% else %}
+                <a href="/login">login</a>
+                <a href="/signup">signup</a>
+            {% endif %}
         </div>
     </div>
 </nav>

@@ -21,7 +21,7 @@ def create_connection(db_file):
 
 @app.route('/')
 def home_page():
-    return render_template("home.html")
+    return render_template("home.html", logged_in=is_logged_in())
 
 
 @app.route('/menu/<cat_id>')
@@ -37,16 +37,18 @@ def menu_page(cat_id):
     category_list = cur.fetchall()
     con.close()
     print(product_list)
-    return render_template("menu.html", products=product_list, categories=category_list)
+    return render_template("menu.html", products=product_list, categories=category_list, logged_in=is_logged_in())
 
 
 @app.route('/contact')
 def contact_page():
-    return render_template("contact.html")
+    return render_template("contact.html", logged_in=is_logged_in())
 
 
 @app.route('/login', methods=['POST', 'GET'])
 def login_page():
+    if is_logged_in():
+        return redirect("/menu/1")
     print("Logging In")
     if request.method == "POST":
         email = request.form['email'].strip().lower()
@@ -81,6 +83,8 @@ def login_page():
 
 @app.route('/signup', methods=['POST', 'GET'])
 def signup_page():
+    if is_logged_in():
+        return redirect("/menu/1")
     if request.method == 'POST':
         print(request.form)
         fname = request.form.get('fname').title().strip()
@@ -113,6 +117,24 @@ def signup_page():
         return redirect('/login')
 
     return render_template("signup.html")
+
+
+@app.route('/logout')
+def logout():
+    print(list(session.keys()))
+    [session.pop(key) for key in list(session.keys())]
+    print(list(session.keys()))
+    return redirect('/?message=See+you+later')
+
+
+def is_logged_in():
+    if session.get("email") is None:
+        print("not logged in")
+        return False
+    else:
+        print(session.get("email"))
+        print("logged in")
+        return True
 
 
 if __name__ == '__main__':
