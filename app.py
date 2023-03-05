@@ -127,6 +127,35 @@ def logout():
     return redirect('/?message=See+you+later')
 
 
+@app.route('/admin')
+def admin_page():
+    if not is_logged_in():
+        return redirect('/?message=Need+to+be+logged+in')
+    con = create_connection(DATABASE)
+    query = "SELECT * FROM category"
+    cur = con.cursor()
+    category_list = cur.fetchall()
+    con.close()
+    return render_template("admin.html", logged_in=is_logged_in(), categories=category_list)
+
+
+@app.route('/add_category', methods=['POST'])
+def add_category():
+    if not is_logged_in():
+        return redirect('/?message=Need+to+be+logged+in')
+    if request.method == "POST":
+        print(request.form)
+        cat_name = request.form.get('name').lower().strip()
+        print(cat_name)
+        con = create_connection(DATABASE)
+        query = "INSERT INTO category ('name') VALUES (?)"
+        cur = con.cursor()
+        cur.execute(query, (cat_name, ))
+        con.commit()
+        con.close()
+        return redirect('/admin')
+
+
 def is_logged_in():
     if session.get("email") is None:
         print("not logged in")
