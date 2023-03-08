@@ -114,6 +114,7 @@ def signup_page():
 
         con.commit()
         con.close()
+
         return redirect('/login')
 
     return render_template("signup.html")
@@ -134,6 +135,7 @@ def admin_page():
     con = create_connection(DATABASE)
     query = "SELECT * FROM category"
     cur = con.cursor()
+    cur.execute(query)
     category_list = cur.fetchall()
     con.close()
     return render_template("admin.html", logged_in=is_logged_in(), categories=category_list)
@@ -150,10 +152,24 @@ def add_category():
         con = create_connection(DATABASE)
         query = "INSERT INTO category ('name') VALUES (?)"
         cur = con.cursor()
-        cur.execute(query, (cat_name, ))
+        cur.execute(query, (cat_name,))
         con.commit()
         con.close()
-        return redirect('/admin')
+    return redirect('/admin')
+
+
+@app.route('/delete_category', methods=['POST'])
+def delete_category():
+    if not is_logged_in():
+        return redirect('/?message=Need+to+be+logged+in')
+    if request.method == 'POST':
+        category = request.form.get('cat_id')
+        print(category)
+        category = category.split(", ")
+        cat_id = category[0]
+        cat_name = category[1]
+        return render_template("delete_confirm.html", id=cat_id, cat_name=cat_name, type="category")
+    return redirect("/admin")
 
 
 def is_logged_in():

@@ -22,7 +22,9 @@
         <div class="form-label"><label for="name">Category Name: </label></div>
         <div class="form-element">
             <select id="cat_id" name="cat_id">
-                <option value=""
+                {% for category in categories %}
+                <option value="{{ category[0] }}, {{ category[1] }}">{{ category[1] }}</option>
+                {% endfor %}
             </select>
         </div>
     </div>
@@ -32,5 +34,9 @@
         <div class="form-element"><input type="submit" value="Delete Category"></div>
     </div>
 </form>
+
+
+<h3>Item Admin</h3>
+<h4>Add an Item</h4>
 
 {% endblock %}
