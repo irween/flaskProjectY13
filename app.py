@@ -9,6 +9,7 @@ app = Flask(__name__)
 bcrypt = Bcrypt(app)
 app.secret_key = "ueuywq9571"
 
+cart = []
 
 def create_connection(db_file):
     try:
@@ -87,19 +88,18 @@ def signup_page():
         return redirect("/menu/1")
     if request.method == 'POST':
         print(request.form)
+
         fname = request.form.get('fname').title().strip()
         lname = request.form.get('lname').title().strip()
         email = request.form.get('email').lower().strip()
         password = request.form.get('password')
         password2 = request.form.get('password2')
+
         print(password)
         print(password2)
 
         if password != password2:
             return redirect("/signup?error=Passwords+do+not+match")
-
-        if len(password) < 8:
-            return redirect("/signup?error=Password+must+be+at+least+8+characters")
 
         hashed_password = bcrypt.generate_password_hash(password)
         con = create_connection(DATABASE)
@@ -169,6 +169,19 @@ def delete_category():
         cat_id = category[0]
         cat_name = category[1]
         return render_template("delete_confirm.html", id=cat_id, cat_name=cat_name, type="category")
+    return redirect("/admin")
+
+
+@app.route('/delete_category_confirm/<cat_id>')
+def delete_category_confirm(cat_id):
+    if not is_logged_in():
+        return redirect('/?message=Need+to+be+logged+in')
+    con = create_connection(DATABASE)
+    query = "DELETE FROM category WHERE id = ?"
+    cur = con.cursor()
+    cur.execute(query, (cat_id, ))
+    con.commit()
+    con.close()
     return redirect("/admin")
 
 

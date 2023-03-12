@@ -44,6 +44,20 @@ h3, h4{
     margin: 2rem 0 0.5rem 0;
 }
 
+ul{
+    font-weight: bold;
+    font-size: 20px;
+    text-align: center;
+    list-style-type: none;
+}
+
+li:hover{
+    text-decoration-line: underline;
+    text-decoration-color: rgba(52, 152, 219, 1.0);
+    transition: .2s ease-in-out;
+    transform: scale(1.1);
+}
+
 nav {
     background-color: rgba(44, 62, 80, 1.0); /* darkest blue */
     text-align: center;
@@ -112,7 +126,8 @@ a, a:visited {
 }
 
 .product-box-image {
-    max-height: 250px;
+    max-height: 125px;
+    object-fit: cover;
     overflow: clip;
 }
 
