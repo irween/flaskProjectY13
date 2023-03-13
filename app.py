@@ -11,6 +11,7 @@ app.secret_key = "ueuywq9571"
 
 cart = []
 
+
 def create_connection(db_file):
     try:
         connection = sqlite3.connect(db_file)
@@ -43,7 +44,7 @@ def menu_page(cat_id):
 
 @app.route('/contact')
 def contact_page():
-    return render_template("contact.html", logged_in=is_logged_in())
+    return render_template("asdf.html", logged_in=is_logged_in())
 
 
 @app.route('/login', methods=['POST', 'GET'])
@@ -183,6 +184,18 @@ def delete_category_confirm(cat_id):
     con.commit()
     con.close()
     return redirect("/admin")
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    print("error")
+    return render_template("error_message.html", message=404)
+
+
+@app.errorhandler(500)
+def page_not_found(e):
+    print("error")
+    return render_template("error_message.html", message=500)
 
 
 def is_logged_in():
