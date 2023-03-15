@@ -13,6 +13,7 @@ menu
         </ul>
     </div>
     <div class="products">
+        <form>
         {% for coffee in products %}
         <div class="product-box">
             <div class="product-box-heading">
@@ -25,8 +26,12 @@ menu
                 <p>{{ coffee[1] }}</p>
                 <p><strong>Size: {{ coffee[2] }}</strong></p>
                 <p><strong>Price: ${{ coffee[4] }}</strong></p>
+                {% if ordering %}
+                    <input type="number" value="0" name="{{ coffee[0] }}" min="0">
+                {% endif %}
             </div>
         </div>
         {% endfor %}
+        </form>
     </div>
 {% endblock %}

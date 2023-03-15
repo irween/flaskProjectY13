@@ -28,6 +28,10 @@ def home_page():
 
 @app.route('/menu/<cat_id>')
 def menu_page(cat_id):
+    order_start = request.args.get("order")
+    if order_start == "start":
+        session["order"] = []
+
     con = create_connection(DATABASE)
     query = "SELECT name, description, volume, image, price FROM products WHERE cat_id=?"
     cur = con.cursor()
@@ -39,12 +43,13 @@ def menu_page(cat_id):
     category_list = cur.fetchall()
     con.close()
     print(product_list)
-    return render_template("menu.html", products=product_list, categories=category_list, logged_in=is_logged_in())
+    return render_template("menu.html", products=product_list, categories=category_list, logged_in=is_logged_in(),
+                           ordering=is_ordering())
 
 
 @app.route('/contact')
 def contact_page():
-    return render_template("asdf.html", logged_in=is_logged_in())
+    return render_template("contact.html", logged_in=is_logged_in())
 
 
 @app.route('/login', methods=['POST', 'GET'])
@@ -206,6 +211,13 @@ def is_logged_in():
         print(session.get("email"))
         print("logged in")
         return True
+
+
+def is_ordering():
+    if session.get("order"):
+        return True
+    else:
+        return False
 
 
 if __name__ == '__main__':
