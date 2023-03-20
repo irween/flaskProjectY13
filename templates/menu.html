@@ -12,26 +12,26 @@ menu
             {% endfor %}
         </ul>
     </div>
+    <form method="POST">
     <div class="products">
-        <form>
         {% for coffee in products %}
         <div class="product-box">
             <div class="product-box-heading">
-                <h3>{{ coffee[0] }}</h3>
+                <h3>{{ coffee[1] }}</h3>
             </div>
             <div class="product-box-image">
-                <img src="/static/images/{{ coffee[3] }}.jpg">
+                <img src="/static/images/{{ coffee[4] }}.jpg">
             </div>
             <div class="product-box-info">
-                <p>{{ coffee[1] }}</p>
-                <p><strong>Size: {{ coffee[2] }}</strong></p>
-                <p><strong>Price: ${{ coffee[4] }}</strong></p>
+                <p>{{ coffee[2] }}</p>
+                <p><strong>Size: {{ coffee[3] }}</strong></p>
+                <p><strong>Price: ${{ coffee[5] }}</strong></p>
                 {% if ordering %}
-                    <input type="number" value="0" name="{{ coffee[0] }}" min="0">
+                    <div class="product-box-info"><a href="/add_to_cart/{{ coffee[0] }}">Add to cart</a></div>
                 {% endif %}
             </div>
         </div>
         {% endfor %}
-        </form>
     </div>
+    </form>
 {% endblock %}

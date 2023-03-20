@@ -21,6 +21,15 @@ def create_connection(db_file):
     return None
 
 
+def get_list(query, execute):
+    con = create_connection(DATABASE)
+    cur = con.cursor()
+    cur.execute(query, execute)
+    category_list = cur.fetchall()
+    con.close()
+    return category_list
+
+
 @app.route('/')
 def home_page():
     return render_template("home.html", logged_in=is_logged_in())
@@ -29,22 +38,24 @@ def home_page():
 @app.route('/menu/<cat_id>')
 def menu_page(cat_id):
     order_start = request.args.get("order")
-    if order_start == "start":
+    if order_start == "start" and not is_ordering():
         session["order"] = []
 
-    con = create_connection(DATABASE)
-    query = "SELECT name, description, volume, image, price FROM products WHERE cat_id=?"
-    cur = con.cursor()
-    cur.execute(query, (cat_id,))
-    product_list = cur.fetchall()
-    query = "SELECT id, name FROM category"
-    cur = con.cursor()
-    cur.execute(query)
-    category_list = cur.fetchall()
-    con.close()
+    product_list = get_list("SELECT id, name, description, volume, image, price FROM products WHERE cat_id=?", (cat_id, ))
+
+    category_list = get_list("SELECT id, name FROM category", "")
+
     print(product_list)
     return render_template("menu.html", products=product_list, categories=category_list, logged_in=is_logged_in(),
                            ordering=is_ordering())
+
+
+@app.route("/cart")
+def cart_page():
+    order = session["order"]
+
+    order = [[x, order.count(x)] for x in set(order)]
+    print(order)
 
 
 @app.route('/contact')
@@ -61,12 +72,7 @@ def login_page():
         email = request.form['email'].strip().lower()
         password = request.form['password'].strip()
 
-        query = """SELECT id, fname, password FROM user WHERE email = ?"""
-        con = create_connection(DATABASE)
-        cur = con.cursor()
-        cur.execute(query, (email,))
-        user_data = cur.fetchall()
-        con.close()
+        user_data = get_list("SELECT id, fname, password FROM user WHERE email = ?", (email, ))
 
         try:
             user_id = user_data[0]
@@ -191,6 +197,23 @@ def delete_category_confirm(cat_id):
     return redirect("/admin")
 
 
+@app.route('/add_to_cart/<product_id>')
+def add_to_cart(product_id):
+    try:
+        product_id = int(product_id)
+    except ValueError:
+        print("{} this is not a number".format(product_id))
+        return redirect("/menu/1?error=not+a+number")
+
+    print("adding to cart product ", product_id)
+    order = session["order"]
+    print("order before adding ", order)
+    order.append(product_id)
+    print("order after adding ", order)
+    session["order"] = order
+    return redirect(request.referrer)
+
+
 @app.errorhandler(404)
 def page_not_found(e):
     print("error")
@@ -214,7 +237,7 @@ def is_logged_in():
 
 
 def is_ordering():
-    if session.get("order"):
+    if request.args.get("order") == "start":
         return True
     else:
         return False
