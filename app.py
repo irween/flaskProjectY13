@@ -50,8 +50,63 @@ def menu_page(cat_id):
                            ordering=is_ordering())
 
 
-@app.route("/cart")
+@app.route('/add_to_cart/<product_id>')
+def add_to_cart(product_id):
+    try:
+        product_id = int(product_id)
+    except ValueError:
+        print("{} this is not a number".format(product_id))
+        return redirect("/menu/1?invalid+id")
+
+    print("adding to cart product ", product_id)
+    order = session["order"]
+    print("order before adding ", order)
+    order.append(product_id)
+    print("order after adding ", order)
+    session["order"] = order
+    return redirect(request.referrer)
+
+
+def insert_data(query, params):
+    con = create_connection(DATABASE)
+    cur = con.cursor()
+    cur.execute(query, params)
+    con.commit()
+    con.close()
+
+
+
+
+
+@app.route("/cart", methods=['POST', 'GET'])
 def cart_page():
+    if request.method == 'POST':
+        name = request.form['name']
+        print(name)
+        insert_data("INSERT INTO orders VALUES (null, ?, TIME('now'), ?)", (name, 1))
+        order_number = get_list("SELECT max(id) FROM orders WHERE name = ?", (name, ))
+        print(order_number)
+        order_number = order_number[0][0]
+        orders = summarise_order()
+        for order in orders:
+            put_data("INSERT INTO order_contents VALUES (null, ?, ?, ?)", (order_number, order[0], order[1]))
+        session.pop('order')
+
+    else:
+        orders = summarise_order()
+        total = 0
+        for item in orders:
+            item_detail = get_list("SELECT name, price FROM product WHERE id = ?", (item[0], ))
+            print(item_detail)
+            if item_detail:
+                item.append(item_detail[0][0])
+                item.append(item_detail[0][1])
+                item.append(item_detail[0][1] * item[1])
+                total += item_detail[0][1] * item[1]
+        print(orders)
+        return render_template("cart.html", logged_in=is_logged_in(), ordering=is_ordering(), products=orders,
+                               total=total)
+
     order = session["order"]
 
     order = [[x, order.count(x)] for x in set(order)]
@@ -197,23 +252,6 @@ def delete_category_confirm(cat_id):
     return redirect("/admin")
 
 
-@app.route('/add_to_cart/<product_id>')
-def add_to_cart(product_id):
-    try:
-        product_id = int(product_id)
-    except ValueError:
-        print("{} this is not a number".format(product_id))
-        return redirect("/menu/1?error=not+a+number")
-
-    print("adding to cart product ", product_id)
-    order = session["order"]
-    print("order before adding ", order)
-    order.append(product_id)
-    print("order after adding ", order)
-    session["order"] = order
-    return redirect(request.referrer)
-
-
 @app.errorhandler(404)
 def page_not_found(e):
     print("error")
@@ -237,7 +275,7 @@ def is_logged_in():
 
 
 def is_ordering():
-    if request.args.get("order") == "start":
+    if session.get("order") is None:
         return True
     else:
         return False
