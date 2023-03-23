@@ -75,7 +75,15 @@ def insert_data(query, params):
     con.close()
 
 
+def summarise_order():
+    order = session['order']
+    print(order)
+    order.sort()
+    print(order)
+    order = [[x, order.count(x)] for x in set(order)]
 
+    print(order)
+    return order
 
 
 @app.route("/cart", methods=['POST', 'GET'])
@@ -89,14 +97,15 @@ def cart_page():
         order_number = order_number[0][0]
         orders = summarise_order()
         for order in orders:
-            put_data("INSERT INTO order_contents VALUES (null, ?, ?, ?)", (order_number, order[0], order[1]))
+            insert_data("INSERT INTO order_contents VALUES (null, ?, ?, ?)", (order_number, order[0], order[1]))
         session.pop('order')
+        return redirect('/?message=Order+has+been+placed+under+' + name)
 
     else:
         orders = summarise_order()
         total = 0
         for item in orders:
-            item_detail = get_list("SELECT name, price FROM product WHERE id = ?", (item[0], ))
+            item_detail = get_list("SELECT name, price FROM products WHERE id = ?", (item[0], ))
             print(item_detail)
             if item_detail:
                 item.append(item_detail[0][0])
@@ -106,11 +115,6 @@ def cart_page():
         print(orders)
         return render_template("cart.html", logged_in=is_logged_in(), ordering=is_ordering(), products=orders,
                                total=total)
-
-    order = session["order"]
-
-    order = [[x, order.count(x)] for x in set(order)]
-    print(order)
 
 
 @app.route('/contact')
@@ -169,18 +173,12 @@ def signup_page():
             return redirect("/signup?error=Passwords+do+not+match")
 
         hashed_password = bcrypt.generate_password_hash(password)
-        con = create_connection(DATABASE)
-        query = "INSERT INTO user (fname, lname, email, password) VALUES (?, ?, ?, ?)"
-        cur = con.cursor()
 
         try:
-            cur.execute(query, (fname, lname, email, hashed_password))
+            insert_data("INSERT INTO user (fname, lname, email, password) VALUES (?, ?, ?, ?)",
+                        (fname, lname, email, hashed_password))
         except sqlite3.IntegrityError:
-            con.close()
             return redirect('/signup?error=Email+is+already+used')
-
-        con.commit()
-        con.close()
 
         return redirect('/login')
 
@@ -276,9 +274,9 @@ def is_logged_in():
 
 def is_ordering():
     if session.get("order") is None:
-        return True
-    else:
         return False
+    else:
+        return True
 
 
 if __name__ == '__main__':
