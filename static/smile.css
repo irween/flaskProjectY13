@@ -191,21 +191,29 @@ a, a:visited {
 }
 
 table {
+    width: 75%;
+    margin: auto;
+    border: 2px solid black;
+}
+
+td, th {
+    border: 1px solid black;
+    padding: 10px;
     border-collapse: collapse;
 }
 
-.cart-table > thead {
-    font-weight: bold;
+.processed {
+    border-color: #00ff00;
 }
 
-.cart-table td {
-    padding: 0.2rem 1rem;
-    text-align: center;
-    border: 1px solid #ddd;
+th {
+    background-color: #333;
+    color: #fff;
 }
 
-.cart-total {
-    font-weight: bold;
+th{
+    background-color: #333;
+    color: #fff;
 }
 
 

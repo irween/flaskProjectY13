@@ -117,6 +117,33 @@ def cart_page():
                                total=total)
 
 
+@app.route('/cancel_order')
+def cancel_order():
+    session.pop('order')
+    return redirect('/?message=Order+has+been+cancelled')
+
+
+@app.route('/process_orders/<processed>')
+def process_orders(processed):
+    label = "processed"
+    if processed == "1":
+        label = "un" + label
+    print(label)
+    processed = int(processed)
+    all_orders = get_list("SELECT orders.id, orders.name, timestamp, products.name, quantity, price FROM orders "
+                          "INNER JOIN order_contents ON orders.id = order_contents.order_id "
+                          "INNER JOIN products on order_contents.product_id = products.id "
+                          "WHERE processed = ?", (processed, ))
+    print(all_orders)
+    return render_template("orders.html", logged_in=is_logged_in(), orders=all_orders, label=label)
+
+
+@app.route('/process/<order_id>')
+def process_order(order_id):
+    insert_data("UPDATE orders SET processed = 0 WHERE id = ?", (order_id, ))
+    return redirect(request.referrer)
+
+
 @app.route('/contact')
 def contact_page():
     return render_template("contact.html", logged_in=is_logged_in())
