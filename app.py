@@ -30,6 +30,25 @@ def get_list(query, execute):
     return category_list
 
 
+def insert_data(query, params):
+    con = create_connection(DATABASE)
+    cur = con.cursor()
+    cur.execute(query, params)
+    con.commit()
+    con.close()
+
+
+def summarise_order():
+    order = session['order']
+    print(order)
+    order.sort()
+    print(order)
+    order = [[x, order.count(x)] for x in set(order)]
+
+    print(order)
+    return order
+
+
 @app.route('/')
 def home_page():
     return render_template("home.html", logged_in=is_logged_in())
@@ -65,25 +84,6 @@ def add_to_cart(product_id):
     print("order after adding ", order)
     session["order"] = order
     return redirect(request.referrer)
-
-
-def insert_data(query, params):
-    con = create_connection(DATABASE)
-    cur = con.cursor()
-    cur.execute(query, params)
-    con.commit()
-    con.close()
-
-
-def summarise_order():
-    order = session['order']
-    print(order)
-    order.sort()
-    print(order)
-    order = [[x, order.count(x)] for x in set(order)]
-
-    print(order)
-    return order
 
 
 @app.route("/cart", methods=['POST', 'GET'])

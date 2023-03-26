@@ -22,4 +22,11 @@
         <td colspan="4" class="number"><strong>Total: ${{ total }}</strong></td>
     </tr>
 </table>
+{% if total > 0 %}
+    <form action="/cart" method="post">
+        <input type="text" name="name" placeholder="Enter your name">
+        <input type="submit" value="Checkout">
+    </form>
+{% endif %}
+
 {% endblock %}

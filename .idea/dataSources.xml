@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="smile" uuid="0f910409-8f3e-4eb8-ac6e-bbcf77a76744">
+    <data-source source="LOCAL" name="smile [2]" uuid="f1f50d5c-1507-45fb-9790-057e06766d3a">
       <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:C:\Users\19214\PycharmProjects\flaskProjectY13\smile.db</jdbc-url>
+      <jdbc-url>jdbc:sqlite:C:\Users\ben\PycharmProjects\flaskProjectY13\smile.db</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>
