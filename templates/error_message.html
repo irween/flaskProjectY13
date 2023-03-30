@@ -1,10 +1,7 @@
 {% extends 'base.html' %}
 
 {% block pageheading %}
-{% if message == 404 %}
-    404 Page Not Found <br>D:
-{% elif message == 500 %}
-    500 <br>D:
+{{message}}
 {% endif %}
 {% endblock %}
 

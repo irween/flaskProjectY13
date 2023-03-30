@@ -90,16 +90,20 @@ def add_to_cart(product_id):
 def cart_page():
     if request.method == 'POST':
         name = request.form['name']
-        print(name)
-        insert_data("INSERT INTO orders VALUES (null, ?, TIME('now'), ?)", (name, 1))
-        order_number = get_list("SELECT max(id) FROM orders WHERE name = ?", (name, ))
-        print(order_number)
-        order_number = order_number[0][0]
-        orders = summarise_order()
-        for order in orders:
-            insert_data("INSERT INTO order_contents VALUES (null, ?, ?, ?)", (order_number, order[0], order[1]))
-        session.pop('order')
-        return redirect('/?message=Order+has+been+placed+under+' + name)
+        if name == "cancel":
+            session.pop('order')
+            return redirect('/?message=Order+has+been+cancelled')
+        else:
+            print(name)
+            insert_data("INSERT INTO orders VALUES (null, ?, TIME('now'), ?)", (name, 1))
+            order_number = get_list("SELECT max(id) FROM orders WHERE name = ?", (name, ))
+            print(order_number)
+            order_number = order_number[0][0]
+            orders = summarise_order()
+            for order in orders:
+                insert_data("INSERT INTO order_contents VALUES (null, ?, ?, ?)", (order_number, order[0], order[1]))
+            session.pop('order')
+            return redirect('/?message=Order+has+been+placed+under+' + name)
 
     else:
         orders = summarise_order()
@@ -278,15 +282,15 @@ def delete_category_confirm(cat_id):
 
 
 @app.errorhandler(404)
-def page_not_found(e):
+def page_not_found(error):
     print("error")
-    return render_template("error_message.html", message=404)
+    return render_template("error_message.html", message=error)
 
 
 @app.errorhandler(500)
-def page_not_found(e):
+def page_not_found(error):
     print("error")
-    return render_template("error_message.html", message=500)
+    return render_template("error_message.html", message=error)
 
 
 def is_logged_in():

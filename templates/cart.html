@@ -26,6 +26,8 @@
     <form action="/cart" method="post">
         <input type="text" name="name" placeholder="Enter your name">
         <input type="submit" value="Checkout">
+        <input type="hidden" name="cancel" value="true">
+        <input type="submit" value="Cancel Order">
     </form>
 
 {% endif %}
